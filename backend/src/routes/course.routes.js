@@ -1,21 +1,67 @@
 import express from "express";
+import authMiddleware from "../middleware/auth.middleware.js";
+import adminMiddleware from "../middleware/admin.middleware.js";
 import {
   createCourse,
-  getCourses,
+  getAllCourses,
   getCourseBySlug,
   updateCourse,
   deleteCourse,
+  updateLesson,
+  deleteLesson,
+  getCourseById,
+  addLesson,
 } from "../controllers/course.controller.js";
-import { protect } from "../middleware/auth.middleware.js";
-import { adminOnly } from "../middleware/admin.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getCourses);
-router.get("/:slug", getCourseBySlug);
+// Public
+router.get("/", getAllCourses);
+router.get("/:slug", getCourseBySlug); 
+router.get("/id/:id", authMiddleware, adminMiddleware, getCourseById);
+// Admin only
+router.post(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  createCourse
+);
 
-router.post("/", protect, adminOnly, createCourse);
-router.put("/:id", protect, adminOnly, updateCourse);
-router.delete("/:id", protect, adminOnly, deleteCourse);
+router.put(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  updateCourse
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  deleteCourse
+);
+
+// Lesson routes (Admin only)
+router.post(
+  "/:id/lessons",
+  authMiddleware,
+  adminMiddleware,
+  addLesson
+);
+
+router.put(
+  "/:courseId/lessons/:lessonId",
+  authMiddleware,
+  adminMiddleware,
+  updateLesson
+);
+
+router.delete(
+  "/:courseId/lessons/:lessonId",
+  authMiddleware,
+  adminMiddleware,
+  deleteLesson
+);
+
 
 export default router;

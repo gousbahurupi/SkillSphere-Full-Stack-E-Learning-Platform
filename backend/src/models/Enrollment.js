@@ -2,33 +2,21 @@ import mongoose from "mongoose";
 
 const enrollmentSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    course: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
 
-    courseId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Course",
-      required: true,
-    },
+    completedLessons: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Lesson" },
+    ],
 
-    progress: {
-      type: Map,
-      of: Boolean, // lessonId => true/false
-      default: {},
-    },
-
-    progressPercentage: {
-      type: Number,
-      default: 0,
+    progress: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ["ongoing", "completed"],
+      default: "ongoing",
     },
   },
   { timestamps: true }
 );
-
-// Prevent duplicate enrollments
-enrollmentSchema.index({ userId: 1, courseId: 1 }, { unique: true });
 
 export default mongoose.model("Enrollment", enrollmentSchema);

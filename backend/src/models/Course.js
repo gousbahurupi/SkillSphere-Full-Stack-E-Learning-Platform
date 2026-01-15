@@ -1,25 +1,56 @@
 import mongoose from "mongoose";
 
 const lessonSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  contentHtml: { type: String, required: true },
-  videoUrl: { type: String },
-  order: { type: Number, required: true },
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  contentHtml: {
+    type: String,
+    required: true,
+  },
+  videoUrl: {
+    type: String,
+  },
+  order: {
+    type: Number,
+    required: true,
+  },
 });
 
 const courseSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true },
-    description: { type: String, required: true },
-    price: { type: Number, default: 0 },
-    category: { type: String, required: true },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
     difficulty: {
       type: String,
       enum: ["beginner", "intermediate", "advanced"],
       required: true,
     },
-    thumbnailUrl: { type: String },
+    thumbnailUrl: {
+      type: String,
+    },
     lessons: [lessonSchema],
   },
   { timestamps: true }

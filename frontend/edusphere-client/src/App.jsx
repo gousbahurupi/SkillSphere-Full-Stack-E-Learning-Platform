@@ -1,18 +1,17 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import AppRoutes from "./routes/AppRoutes";
+import Header from "./components/common/Header";
+import Footer from "./components/common/Footer";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-      <h1 className="text-4xl font-bold text-blue-400">
-        EduSphere is Live 🚀
-      </h1>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1">
+        <AppRoutes />
+      </main>
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
