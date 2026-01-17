@@ -36,7 +36,6 @@ const CourseDetail = () => {
             className="border p-3 rounded hover:bg-gray-50"
           >
             <Link
-              to={`/courses/${course.slug}/lesson/${index}`}
               className="text-blue-600 font-medium"
             >
               {lesson.order}. {lesson.title}

@@ -7,6 +7,8 @@ const Payment = () => {
   const { courseId } = useParams();
   
   const handlePayment = async () => {
+    console.log("Processing payment for course ID:", courseId);
+    console.log(typeof(courseId));
     await enrollCourse(courseId);
     alert("Payment successful!");
     navigate("/my-courses");

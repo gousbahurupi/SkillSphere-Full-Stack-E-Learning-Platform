@@ -2,6 +2,23 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
+/* ================= HELPERS ================= */
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+
+  try {
+    const ytMatch =
+      url.match(/youtu\.be\/([^?]+)/) ||
+      url.match(/youtube\.com\/watch\?v=([^&]+)/);
+
+    if (!ytMatch) return null;
+
+    return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  } catch {
+    return null;
+  }
+};
+
 const CoursePlayer = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -77,6 +94,10 @@ const CoursePlayer = () => {
       (completedLessons.length / course.lessons.length) * 100
     ) || 0;
 
+  const videoEmbedUrl = getYouTubeEmbedUrl(
+    activeLesson.videoUrl
+  );
+
   return (
     <div className="flex h-[90vh]">
       {/* LEFT: LESSON LIST */}
@@ -93,7 +114,9 @@ const CoursePlayer = () => {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-sm mt-1">{progress}% completed</p>
+          <p className="text-sm mt-1">
+            {progress}% completed
+          </p>
         </div>
 
         {course.lessons.map((lesson, index) => (
@@ -112,7 +135,9 @@ const CoursePlayer = () => {
               </span>
 
               {completedLessons.includes(lesson._id) && (
-                <span className="text-green-600 font-bold">✔</span>
+                <span className="text-green-600 font-bold">
+                  ✔
+                </span>
               )}
             </div>
           </div>
@@ -120,25 +145,32 @@ const CoursePlayer = () => {
       </aside>
 
       {/* RIGHT: PLAYER */}
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 overflow-y-auto">
         <h1 className="text-xl font-semibold mb-4">
           {activeLesson.title}
         </h1>
 
-        {/* VIDEO */}
-        <div className="mb-4">
-          <iframe
-            src={activeLesson.videoUrl}
-            title={activeLesson.title}
-            className="w-full h-[400px] rounded"
-            allowFullScreen
-          />
-        </div>
+        {/* VIDEO (only if valid YouTube URL) */}
+        {videoEmbedUrl && (
+          <div className="mb-6">
+            <iframe
+              src={videoEmbedUrl}
+              title={activeLesson.title}
+              className="w-full h-[400px] rounded"
+              allowFullScreen
+            />
+          </div>
+        )}
 
-        {/* DESCRIPTION */}
-        <p className="mb-6 text-gray-700">
-          {activeLesson.description}
-        </p>
+        {/* CONTENT HTML */}
+        {activeLesson.contentHtml && (
+          <div
+            className="prose max-w-none mb-6"
+            dangerouslySetInnerHTML={{
+              __html: activeLesson.contentHtml,
+            }}
+          />
+        )}
 
         {/* COMPLETE BUTTON */}
         {!completedLessons.includes(activeLesson._id) && (
