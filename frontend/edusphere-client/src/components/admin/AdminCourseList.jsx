@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllCourses, deleteCourse } from "../../services/course.service";
+import {
+  getAllCourses,
+  deleteCourse,
+} from "../../services/course.service";
 
 const AdminCourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -16,47 +19,72 @@ const AdminCourseList = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this course?")) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this course?"
+      )
+    )
+      return;
 
     await deleteCourse(id);
-    alert("Course deleted");
-    window.location.reload(); // simple + safe for now
+    fetchCourses(); // better UX than reload
   };
+
+  if (!courses.length) {
+    return (
+      <div className="glass p-10 rounded-3xl text-center text-gray-400">
+        No courses created yet.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {courses.map((course) => (
         <div
           key={course._id}
-          className="bg-white p-4 rounded shadow flex justify-between items-center"
+          className="glass p-5 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
+          {/* LEFT INFO */}
           <div>
-            <h3 className="text-lg font-semibold">{course.title}</h3>
-            <p className="text-sm text-gray-500">
-              {course.category} • {course.difficulty}
+            <h3 className="text-lg font-semibold">
+              {course.title}
+            </h3>
+            <p className="text-sm text-gray-400 mt-1">
+              {course.category} • {course.difficulty} •{" "}
+              {course.price === 0
+                ? "Free"
+                : `₹${course.price}`}
             </p>
           </div>
 
-          <div className="space-x-2">
+          {/* ACTIONS */}
+          <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => navigate(`/admin/courses/${course._id}/edit`)}
-              className="px-3 py-1 bg-blue-600 text-white rounded"
+              onClick={() =>
+                navigate(
+                  `/admin/courses/${course._id}/edit`
+                )
+              }
+              className="px-4 py-2 rounded-lg bg-blue-600/80 hover:bg-blue-600 transition text-sm font-medium"
             >
               Edit
             </button>
 
             <button
               onClick={() =>
-                navigate(`/admin/courses/${course._id}/lessons`)
+                navigate(
+                  `/admin/courses/${course._id}/lessons`
+                )
               }
-              className="px-3 py-1 bg-green-600 text-white rounded"
+              className="px-4 py-2 rounded-lg bg-green-600/80 hover:bg-green-600 transition text-sm font-medium"
             >
-              Manage Lessons
+              Lessons
             </button>
 
             <button
               onClick={() => handleDelete(course._id)}
-              className="px-3 py-1 bg-red-600 text-white rounded"
+              className="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 transition text-sm font-medium"
             >
               Delete
             </button>

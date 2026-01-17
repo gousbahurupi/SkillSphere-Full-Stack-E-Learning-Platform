@@ -3,7 +3,6 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import courseRoutes from "./routes/course.routes.js";
 import router from "./routes/enroll.routes.js";
-
 const app = express();
 
 app.use("/api/auth", authRoutes);

@@ -2,22 +2,47 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 
+/* ================= ICONS ================= */
+
+const CheckIcon = () => (
+  <svg
+    className="w-4 h-4 text-green-500"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    viewBox="0 0 24 24"
+  >
+    <path d="M5 13l4 4L19 7" />
+  </svg>
+);
+
+const PlayIcon = () => (
+  <svg
+    className="w-4 h-4 text-blue-500"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+  >
+    <polygon points="6 4 20 12 6 20 6 4" />
+  </svg>
+);
+
 /* ================= HELPERS ================= */
+
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return null;
 
-  try {
-    const ytMatch =
-      url.match(/youtu\.be\/([^?]+)/) ||
-      url.match(/youtube\.com\/watch\?v=([^&]+)/);
+  const match =
+    url.match(/youtu\.be\/([^?]+)/) ||
+    url.match(/youtube\.com\/watch\?v=([^&]+)/);
 
-    if (!ytMatch) return null;
-
-    return `https://www.youtube.com/embed/${ytMatch[1]}`;
-  } catch {
-    return null;
-  }
+  return match
+    ? `https://www.youtube.com/embed/${match[1]}`
+    : null;
 };
+
+/* ================= COMPONENT ================= */
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
@@ -29,40 +54,31 @@ const CoursePlayer = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadEnrolledCourse();
+    loadCourse();
   }, [courseId]);
 
-  /* ================= LOAD ENROLLED COURSE ================= */
-  const loadEnrolledCourse = async () => {
+  const loadCourse = async () => {
     try {
       const res = await api.get("/enroll/my-courses");
-
       const enrollment = res.data.find(
         (e) => e.course._id === courseId
       );
 
       if (!enrollment) {
-        alert("You are not enrolled in this course");
         navigate("/courses");
         return;
       }
 
       setCourse(enrollment.course);
       setCompletedLessons(enrollment.completedLessons || []);
-
-      if (enrollment.course.lessons?.length > 0) {
-        setActiveLesson(enrollment.course.lessons[0]);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+      setActiveLesson(enrollment.course.lessons?.[0]);
+    } catch {
       navigate("/courses");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= MARK LESSON COMPLETE ================= */
   const markLessonComplete = async () => {
     try {
       await api.post(
@@ -74,109 +90,123 @@ const CoursePlayer = () => {
           ? prev
           : [...prev, activeLesson._id]
       );
-    } catch (err) {
-      console.error(err);
-      alert("Could not mark lesson complete");
+    } catch {
+      alert("Failed to update progress");
     }
   };
 
   if (loading) {
-    return <p className="p-6">Loading course...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-lg">
+        Loading course content...
+      </div>
+    );
   }
 
   if (!course || !activeLesson) {
-    return <p className="p-6">No lessons available</p>;
+    return (
+      <div className="p-6 text-center">
+        No lessons available
+      </div>
+    );
   }
 
-  /* ================= PROGRESS ================= */
-  const progress =
-    Math.round(
-      (completedLessons.length / course.lessons.length) * 100
-    ) || 0;
+  const progress = Math.round(
+    (completedLessons.length / course.lessons.length) *
+      100
+  );
 
-  const videoEmbedUrl = getYouTubeEmbedUrl(
+  const videoUrl = getYouTubeEmbedUrl(
     activeLesson.videoUrl
   );
 
   return (
-    <div className="flex h-[90vh]">
-      {/* LEFT: LESSON LIST */}
-      <aside className="w-1/4 bg-gray-100 p-4 overflow-y-auto">
-        <h2 className="font-bold text-lg mb-2">
-          {course.title}
-        </h2>
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* ================= SIDEBAR ================= */}
+      <aside className="lg:w-80 border-r border-white/10 bg-black/30 backdrop-blur-lg">
+        <div className="p-6 border-b border-white/10">
+          <h2 className="text-lg font-bold mb-2">
+            {course.title}
+          </h2>
 
-        {/* PROGRESS */}
-        <div className="mb-4">
-          <div className="h-2 bg-gray-300 rounded">
-            <div
-              className="h-2 bg-green-500 rounded"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="space-y-1">
+            <div className="h-2 bg-white/10 rounded">
+              <div
+                className="h-2 bg-green-500 rounded transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-400">
+              {progress}% completed
+            </p>
           </div>
-          <p className="text-sm mt-1">
-            {progress}% completed
-          </p>
         </div>
 
-        {course.lessons.map((lesson, index) => (
-          <div
-            key={lesson._id}
-            onClick={() => setActiveLesson(lesson)}
-            className={`p-2 mb-2 rounded cursor-pointer ${
-              activeLesson._id === lesson._id
-                ? "bg-blue-500 text-white"
-                : "bg-white"
-            }`}
-          >
-            <div className="flex justify-between items-center">
-              <span>
-                {index + 1}. {lesson.title}
-              </span>
+        <div className="p-4 space-y-2 overflow-y-auto max-h-[70vh]">
+          {course.lessons.map((lesson, idx) => {
+            const isActive =
+              lesson._id === activeLesson._id;
+            const isCompleted =
+              completedLessons.includes(lesson._id);
 
-              {completedLessons.includes(lesson._id) && (
-                <span className="text-green-600 font-bold">
-                  ✔
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
+            return (
+              <button
+                key={lesson._id}
+                onClick={() => setActiveLesson(lesson)}
+                className={`w-full text-left p-3 rounded-lg transition flex items-center justify-between ${
+                  isActive
+                    ? "bg-blue-600/20 border border-blue-500/30"
+                    : "hover:bg-white/5"
+                }`}
+              >
+                <div className="flex items-center gap-2 text-sm">
+                  {isCompleted ? (
+                    <CheckIcon />
+                  ) : (
+                    <PlayIcon />
+                  )}
+                  <span>
+                    {idx + 1}. {lesson.title}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </aside>
 
-      {/* RIGHT: PLAYER */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        <h1 className="text-xl font-semibold mb-4">
+      {/* ================= CONTENT ================= */}
+      <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
+        <h1 className="text-2xl font-bold mb-6">
           {activeLesson.title}
         </h1>
 
-        {/* VIDEO (only if valid YouTube URL) */}
-        {videoEmbedUrl && (
-          <div className="mb-6">
+        {videoUrl && (
+          <div className="mb-8 aspect-video rounded-2xl overflow-hidden border border-white/10">
             <iframe
-              src={videoEmbedUrl}
+              src={videoUrl}
               title={activeLesson.title}
-              className="w-full h-[400px] rounded"
+              className="w-full h-full"
               allowFullScreen
             />
           </div>
         )}
 
-        {/* CONTENT HTML */}
         {activeLesson.contentHtml && (
           <div
-            className="prose max-w-none mb-6"
+            className="prose prose-invert max-w-none mb-10"
             dangerouslySetInnerHTML={{
               __html: activeLesson.contentHtml,
             }}
           />
         )}
 
-        {/* COMPLETE BUTTON */}
-        {!completedLessons.includes(activeLesson._id) && (
+        {!completedLessons.includes(
+          activeLesson._id
+        ) && (
           <button
             onClick={markLessonComplete}
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 transition px-8 py-3 rounded-xl font-semibold"
           >
             Mark Lesson as Completed
           </button>

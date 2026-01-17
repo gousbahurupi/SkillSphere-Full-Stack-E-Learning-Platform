@@ -6,15 +6,12 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("LOGIN BODY:", req.body);
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
     const user = await User.findOne({ email });
-
-    console.log("USER FROM DB:", user);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });

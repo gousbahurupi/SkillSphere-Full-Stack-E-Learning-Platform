@@ -36,7 +36,10 @@ const EditCourse = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.name === "price"
+          ? Number(e.target.value)
+          : e.target.value,
     });
   };
 
@@ -49,62 +52,121 @@ const EditCourse = () => {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-4">Edit Course</h1>
+      {/* HEADER */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-1">
+          Edit Course
+        </h1>
+        <p className="text-gray-400 text-sm">
+          Update course details and pricing information
+        </p>
+      </div>
 
+      {/* FORM */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow max-w-xl space-y-3"
+        className="glass p-8 rounded-3xl max-w-2xl space-y-5"
       >
-        <input
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Title"
-          className="w-full p-2 border"
-          required
-        />
+        {/* TITLE */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-300">
+            Course Title
+          </label>
+          <input
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Enter course title"
+            className="input"
+            required
+          />
+        </div>
 
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Description"
-          className="w-full p-2 border"
-          required
-        />
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-300">
+            Description
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Course description"
+            rows={4}
+            className="input resize-none"
+            required
+          />
+        </div>
 
-        <input
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          placeholder="Category"
-          className="w-full p-2 border"
-          required
-        />
+        {/* CATEGORY */}
+        <div>
+          <label className="block text-sm mb-1 text-gray-300">
+            Category
+          </label>
+          <input
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            placeholder="e.g. Programming"
+            className="input"
+            required
+          />
+        </div>
 
-        <input
-          type="number"
-          name="price"
-          value={formData.price}
-          onChange={handleChange}
-          placeholder="Price"
-          className="w-full p-2 border"
-        />
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* PRICE */}
+          <div>
+            <label className="block text-sm mb-1 text-gray-300">
+              Price (₹)
+            </label>
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              min="0"
+              className="input"
+            />
+          </div>
 
-        <select
-          name="difficulty"
-          value={formData.difficulty}
-          onChange={handleChange}
-          className="w-full p-2 border"
-        >
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-        </select>
+          {/* DIFFICULTY */}
+          <div>
+            <label className="block text-sm mb-1 text-gray-300">
+              Difficulty
+            </label>
+            <select
+              name="difficulty"
+              value={formData.difficulty}
+              onChange={handleChange}
+              className="input"
+            >
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">
+                Intermediate
+              </option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
 
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
-          Update Course
-        </button>
+        {/* ACTIONS */}
+        <div className="flex gap-4 pt-4">
+          <button
+            type="submit"
+            className="btn-primary px-8 py-3 rounded-xl"
+          >
+            Update Course
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/admin/courses")}
+            className="btn-secondary px-8 py-3 rounded-xl"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </AdminLayout>
   );

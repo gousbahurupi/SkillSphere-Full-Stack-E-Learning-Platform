@@ -49,7 +49,7 @@ export const deleteCourse = async (id) => {
 };
 
 export const getCourseById = async (id) => {
-  const res = await api.get(`/courses/${id}`);
+  const res = await api.get(`/courses/id/${id}`);
   return res.data;
 };
 

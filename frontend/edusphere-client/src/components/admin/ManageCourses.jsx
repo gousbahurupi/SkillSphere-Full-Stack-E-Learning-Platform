@@ -4,7 +4,16 @@ import CourseForm from "../../components/admin/CourseForm";
 const ManageCourses = () => {
   return (
     <AdminLayout>
-      <h1 className="text-3xl font-bold mb-6">Manage Courses</h1>
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold mb-2">
+          Create New Course
+        </h1>
+        <p className="text-gray-400 text-sm">
+          Add a new course to the platform with pricing,
+          difficulty, and category details.
+        </p>
+      </div>
+
       <CourseForm />
     </AdminLayout>
   );
