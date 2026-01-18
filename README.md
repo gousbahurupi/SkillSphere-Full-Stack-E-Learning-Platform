@@ -179,11 +179,11 @@ npm run dev
 
 --- 
 
-🌐 Live Demo
+##🌐 Live Demo
 
 The SkillSphere – Full Stack E-Learning Platform is live and fully deployed.
 
-Frontend (Vercel):
+###Frontend (Vercel):
 https://skill-sphere-beta.vercel.app
 
 
