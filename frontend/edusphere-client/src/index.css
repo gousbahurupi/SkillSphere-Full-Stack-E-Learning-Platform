@@ -99,17 +99,26 @@ body {
 
 /* ===============================
    TERMINAL STYLE CODE BLOCK
-   FIXED SIZE + INTERNAL SCROLL
+   FIXED HEIGHT + INTERNAL SCROLL
 ================================ */
+
+/* Wrapper (keeps terminal inside lesson) */
+.lesson-code-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-top: 1rem;
+  min-width: 0;
+}
 
 /* Terminal container */
 .lesson-code {
-  width: 900px;
-  height: 420px;              /* ✅ STATIC HEIGHT */
+  width: 100%;                /* ✅ responsive */
+  max-width: 900px;           /* ✅ desktop size */
+  height: 420px;              /* ✅ static height */
+
   background: #000;
   border-radius: 14px;
-  padding: 0;
-  overflow: hidden;           /* 🔒 CONTAIN EVERYTHING */
+  overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 
   display: flex;
@@ -129,7 +138,7 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Terminal dots */
+/* macOS dots */
 .lesson-code-dot {
   width: 12px;
   height: 12px;
@@ -140,24 +149,26 @@ body {
 .lesson-code-dot.yellow { background: #ffbd2e; }
 .lesson-code-dot.green { background: #27c93f; }
 
-/* Terminal body (SCROLL AREA) */
+/* Scrollable body */
 .lesson-code-body {
-  flex: 1;                    /* ✅ TAKE REMAINING SPACE */
-  overflow: auto;             /* ✅ SCROLL INSIDE ONLY */
+  flex: 1;
+  overflow: auto;             /* ✅ scroll only here */
   padding: 1.25rem;
 }
 
-/* Code text */
+/* Code styling */
 .lesson-code-body pre {
   margin: 0;
-  white-space: pre;
+  max-width: 100%;
+  white-space: pre;           /* no wrapping */
   font-family: "Fira Code", monospace;
   font-size: 14px;
   line-height: 1.6;
   color: #e5e7eb;
 }
 
-/* Flex overflow fix (addition only) */
+/* Flex overflow safety */
 .lesson-block {
   min-width: 0;
 }
+
