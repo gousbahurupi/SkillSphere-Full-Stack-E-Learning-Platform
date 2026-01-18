@@ -4,23 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===============================
-   GLOBAL BASE
-================================ */
+/* ===== GLOBAL BASE ===== */
 @layer base {
   body {
-    @apply font-sans bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900
-           text-white min-h-screen;
+    @apply font-sans bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white min-h-screen;
   }
 }
 
-/* ===============================
-   GLASS UI COMPONENTS
-================================ */
+/* ===== GLASS UI COMPONENTS ===== */
 @layer components {
   .glass {
-    @apply bg-white/10 backdrop-blur-md border border-white/20
-           shadow-2xl rounded-2xl;
+    @apply bg-glass backdrop-blur-md border border-glassBorder shadow-glass rounded-2xl;
   }
 
   .glass-card {
@@ -28,58 +22,117 @@
   }
 
   .btn-primary {
-    @apply bg-indigo-500 hover:bg-indigo-600
-           text-white font-medium px-6 py-2
-           rounded-xl transition;
+    @apply bg-primary hover:bg-indigo-600 text-white font-medium px-6 py-2 rounded-xl transition;
   }
 
   .btn-secondary {
-    @apply bg-cyan-400 hover:bg-cyan-500
-           text-black font-medium px-6 py-2
-           rounded-xl transition;
+    @apply bg-secondary hover:bg-cyan-500 text-black font-medium px-6 py-2 rounded-xl transition;
   }
 }
 
+
 /* ===============================
-   LESSON LAYOUT
+   GLOBAL THEME VARIABLES
 ================================ */
+:root {
+  --bg: #0b0f1a;
+  --surface: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.15);
+  --primary: #6366f1; /* Indigo */
+  --secondary: #22d3ee; /* Cyan */
+  --text-muted: #9ca3af;
+}
+
+/* ===============================
+   BASE STYLES
+================================ */
+body {
+  @apply bg-[#0b0f1a] text-white font-sans;
+}
+
+/* ===============================
+   GLASSMORPHISM
+================================ */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* ===============================
+   INPUTS
+================================ */
+.input {
+  @apply w-full px-4 py-3 rounded-xl text-sm text-white
+         bg-white/5 border border-white/10
+         focus:outline-none focus:ring-2 focus:ring-indigo-500
+         placeholder:text-gray-400 transition;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+.btn-primary {
+  @apply bg-indigo-500 hover:bg-indigo-600
+         text-white font-semibold transition;
+}
+
+.btn-secondary {
+  @apply bg-white/10 hover:bg-white/20
+         text-white font-semibold transition;
+}
+
 .lesson-content {
-  @apply flex flex-col gap-10;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .lesson-block {
-  @apply bg-white/5 border border-white/10
-         rounded-2xl p-7;
-
-  /* 🔴 CRITICAL FIX FOR FLEX OVERFLOW */
-  min-width: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ===============================
-   LESSON CODE BLOCK (REUSABLE)
+   LESSON CODE BLOCK (RUNTIME SAFE)
+   Tailwind-safe, NOT purged
 ================================ */
-@layer components {
 
-  /* Outer scroll container */
-  .lesson-code-wrapper {
-    @apply max-w-full overflow-x-auto mt-4
-           rounded-xl border border-white/10;
-    
-    min-width: 0; /* FLEX FIX */
-    -webkit-overflow-scrolling: touch;
-  }
+/* Outer scroll container */
+.lesson-code-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  margin-top: 1rem;
 
-  /* Fixed-width inner block */
-  .lesson-code {
-    @apply w-[900px] bg-black
-           rounded-xl p-5;
-  }
+  /* Required for flex layouts */
+  min-width: 0;
 
-  /* Code text */
-  .lesson-code pre {
-    @apply m-0 text-sm leading-relaxed
-           text-gray-200 font-mono;
+  -webkit-overflow-scrolling: touch;
+}
 
-    white-space: pre;
-  }
+/* Fixed-width inner code box */
+.lesson-code {
+  width: 900px;            /* Fixed width */
+  background: #000;        /* BLACK background */
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+/* Code formatting */
+.lesson-code pre {
+  margin: 0;
+  white-space: pre;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e5e7eb;
+}
+
+/* Flex overflow fix (addition only) */
+.lesson-block {
+  min-width: 0;
 }
