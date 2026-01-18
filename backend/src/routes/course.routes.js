@@ -15,11 +15,21 @@ import {
 
 const router = express.Router();
 
-// Public
+/* ================= PUBLIC ================= */
 router.get("/", getAllCourses);
-router.get("/:slug", getCourseBySlug); 
-router.get("/id/:id", authMiddleware, adminMiddleware, getCourseById);
-// Admin only
+
+/* 🔒 ADMIN FETCH BY ID (must come BEFORE :slug) */
+router.get(
+  "/id/:id",
+  authMiddleware,
+  adminMiddleware,
+  getCourseById
+);
+
+/* ================= PUBLIC ================= */
+router.get("/:slug", getCourseBySlug);
+
+/* ================= ADMIN ONLY ================= */
 router.post(
   "/",
   authMiddleware,
@@ -41,7 +51,7 @@ router.delete(
   deleteCourse
 );
 
-// Lesson routes (Admin only)
+/* ================= LESSONS (ADMIN) ================= */
 router.post(
   "/:id/lessons",
   authMiddleware,
@@ -62,6 +72,5 @@ router.delete(
   adminMiddleware,
   deleteLesson
 );
-
 
 export default router;

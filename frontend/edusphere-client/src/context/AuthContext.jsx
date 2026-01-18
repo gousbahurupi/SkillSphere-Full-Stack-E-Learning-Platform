@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
 
@@ -6,52 +6,70 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(
+    localStorage.getItem("token")
+  );
 
-  useEffect(() => {
-    if (token) {
-      // optional: axios default header
-    }
-  }, [token]);
-
-  // ✅ LOGIN
   const login = async ({ email, password }) => {
-    const res = await fetch("https://skill-sphere-vioy.onrender.com/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch(
+        "https://skill-sphere-vioy.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
+      const data = await res.json();
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-    setUser(data.user);
-    setToken(data.token);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-    return data.user;
+      setUser(data.user);
+      setToken(data.token);
+
+      return data.user;
+    } catch (error) {
+      throw new Error(
+        error.message || "Network error. Please try again."
+      );
+    }
   };
 
-  // ✅ REGISTER  (THIS MUST EXIST)
   const register = async (formData) => {
-    const res = await fetch("https://skill-sphere-vioy.onrender.com/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch(
+        "https://skill-sphere-vioy.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
+      const data = await res.json();
 
-    return data;
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.message || "Network error. Please try again."
+      );
+    }
   };
 
   const logout = () => {
+    localStorage.clear();
     setUser(null);
     setToken(null);
-    localStorage.clear();
   };
 
   return (
