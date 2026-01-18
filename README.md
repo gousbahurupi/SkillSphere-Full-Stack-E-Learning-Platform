@@ -186,8 +186,6 @@ The SkillSphere – Full Stack E-Learning Platform is live and fully deployed.
 Frontend (Vercel):
 https://skill-sphere-beta.vercel.app
 
-Backend API (Render):
-https://skill-sphere-vioy.onrender.com
 
 --- 
 
