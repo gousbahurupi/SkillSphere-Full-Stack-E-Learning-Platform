@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import logo from "../assets/SkillSphere.svg";
+import { validateSignup } from "../uitls/validators";
 
 const Signup = () => {
   const { register } = useAuth();
@@ -15,20 +16,29 @@ const Signup = () => {
     role: "user",
   });
 
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  /* ================= HANDLE CHANGE ================= */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // clear field error
   };
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
+    const validationErrors = validateSignup(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setLoading(true);
     try {
       await register(formData);
-      alert("Signup successful");
       navigate("/login");
     } catch (err) {
       alert(err.message || "Signup failed");
@@ -45,45 +55,53 @@ const Signup = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="glass w-full max-w-md p-8 rounded-3xl relative z-10"
+        className="glass w-full max-w-md p-8 rounded-3xl relative z-10 space-y-4"
       >
         {/* Logo */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-2">
           <img src={logo} alt="SkillSphere" className="h-10" />
         </div>
 
-        <h2 className="text-2xl font-bold text-center mb-6">
+        <h2 className="text-2xl font-bold mb-4 text-center">
           Create Account
         </h2>
 
-        <input
-          name="name"
-          placeholder="Full name"
-          onChange={handleChange}
-          className="w-full p-3 mb-4 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
+        {/* NAME */}
+        <div>
+          <input
+            name="name"
+            placeholder="Full name"
+            onChange={handleChange}
+            className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {errors.name && (
+            <p className="text-sm text-red-400 mt-1">{errors.name}</p>
+          )}
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email address"
-          onChange={handleChange}
-          className="w-full p-3 mb-4 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
+        {/* EMAIL */}
+        <div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email address"
+            onChange={handleChange}
+            className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {errors.email && (
+            <p className="text-sm text-red-400 mt-1">{errors.email}</p>
+          )}
+        </div>
 
-        {/* Password */}
-        <div className="relative mb-4">
+        {/* PASSWORD */}
+        <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
             onChange={handleChange}
             className="w-full p-3 pr-12 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
-            required
           />
-
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -91,18 +109,22 @@ const Signup = () => {
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
+          {errors.password && (
+            <p className="text-sm text-red-400 mt-1">{errors.password}</p>
+          )}
         </div>
 
-        {/* Role */}
+        {/* ROLE */}
         <select
           name="role"
           onChange={handleChange}
-          className="w-full p-3 mb-6 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
 
+        {/* SUBMIT */}
         <button
           disabled={loading}
           className="w-full bg-primary py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition disabled:opacity-50"
@@ -111,7 +133,7 @@ const Signup = () => {
           {loading ? "Creating account..." : "Sign Up"}
         </button>
 
-        <p className="text-sm text-gray-300 text-center mt-6">
+        <p className="text-sm text-gray-300 text-center mt-4">
           Already have an account?{" "}
           <Link
             to="/login"
