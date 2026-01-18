@@ -13,48 +13,36 @@ connectDB();
 
 const app = express();
 
-/* =========================
-   ✅ PRODUCTION CORS SETUP
-   ========================= */
+/* ✅ FIXED CORS CONFIG */
 const allowedOrigins = [
-  "http://localhost:5173", // local frontend
-  "https://skill-sphere-951jl3qt7-gous-bahurupis-projects.vercel.app", // vercel frontend
+  "http://localhost:5173",
+  "https://skill-sphere-beta.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // allow requests without origin (Postman, server-to-server)
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("CORS not allowed"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
   })
 );
 
-/* =========================
-   MIDDLEWARES
-   ========================= */
 app.use(express.json());
 
-/* =========================
-   ROUTES
-   ========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/enroll", enrollRoutes);
 app.use("/api/admin", adminRoutes);
 
-/* =========================
-   SERVER
-   ========================= */
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
