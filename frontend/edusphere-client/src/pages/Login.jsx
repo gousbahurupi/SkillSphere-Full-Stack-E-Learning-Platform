@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, LogIn } from "lucide-react";
+import { isValidEmail } from "../uitls/validators";
 import logo from "../assets/SkillSphere.svg";
 
 const Login = () => {
@@ -13,17 +14,42 @@ const Login = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Clear error when user starts typing
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
+  /* ================= VALIDATION ================= */
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
+    if (!validate()) return;
+
+    setLoading(true);
     try {
       const user = await login(formData);
 
@@ -33,7 +59,9 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (err) {
-      alert(err.message || "Login failed");
+      setErrors({
+        form: err.message || "Invalid email or password",
+      });
     } finally {
       setLoading(false);
     }
@@ -58,35 +86,52 @@ const Login = () => {
           Welcome Back
         </h2>
 
+        {/* FORM ERROR */}
+        {errors.form && (
+          <p className="text-red-400 text-sm mb-4 text-center">
+            {errors.form}
+          </p>
+        )}
+
         {/* Email */}
         <input
           type="email"
           name="email"
           placeholder="Email address"
+          value={formData.email}
           onChange={handleChange}
-          className="w-full p-3 mb-4 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
+          className="w-full p-3 mb-5 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
         />
+        {errors.email && (
+          <p className="text-red-400 text-sm mb-3">
+            {errors.email}
+          </p>
+        )}
 
         {/* Password */}
-        <div className="relative mb-6">
+        <div className="relative mb-5">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
+            value={formData.password}
             onChange={handleChange}
-            className="w-full p-3 pr-12 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary"
-            required
+            className="w-full p-3 pr-12 rounded-xl bg-white/10 border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary "
           />
 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white mb-5"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
+        {errors.password && (
+          <p className="text-red-400 text-sm mb-4">
+            {errors.password}
+          </p>
+        )}
 
         {/* Submit */}
         <button

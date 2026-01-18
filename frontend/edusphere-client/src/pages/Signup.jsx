@@ -9,7 +9,7 @@ import {
   isValidEmail,
   isStrongPassword,
   isValidName,
-} from "../utils/validators";
+} from "../uitls/validators";
 
 const Signup = () => {
   const { register } = useAuth();
