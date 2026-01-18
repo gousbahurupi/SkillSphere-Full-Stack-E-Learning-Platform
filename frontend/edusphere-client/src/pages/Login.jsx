@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Eye, EyeOff, LogIn } from "lucide-react";
-import logo from "../assets/skillsphere.svg";
+import logo from "../assets/SkillSphere.svg";
 
 const Login = () => {
   const { login } = useAuth();

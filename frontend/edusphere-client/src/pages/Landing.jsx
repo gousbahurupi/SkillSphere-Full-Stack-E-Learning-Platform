@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../assets/skillsphere.svg";
+import logo from "../assets/SkillSphere.svg";
 
 const Landing = () => {
   return (

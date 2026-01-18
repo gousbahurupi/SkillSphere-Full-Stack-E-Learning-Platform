@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import logo from "../../assets/skillsphere.svg";
+import logo from "../../assets/SkillSphere.svg";
 
 const Header = () => {
   const { user, logout } = useAuth();
