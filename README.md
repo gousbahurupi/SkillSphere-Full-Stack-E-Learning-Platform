@@ -160,7 +160,7 @@ npm run dev
 - Tracking user learning progress
 
 - Admin dashboard and content management
-
+  
 ---
 
 ## 📌 Future Enhancements
@@ -176,6 +176,18 @@ npm run dev
 - Search and filters
 
 - Deployment (Render & Netlify)
+
+--- 
+
+🌐 Live Demo
+
+The SkillSphere – Full Stack E-Learning Platform is live and fully deployed.
+
+Frontend (Vercel):
+https://skill-sphere-beta.vercel.app
+
+Backend API (Render):
+https://skill-sphere-vioy.onrender.com
 
 --- 
 
