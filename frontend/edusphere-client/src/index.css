@@ -99,20 +99,26 @@ body {
 
 /* ===============================
    TERMINAL STYLE CODE BLOCK
+   FIXED SIZE + INTERNAL SCROLL
 ================================ */
 
-/* Terminal container (replaces plain black box) */
+/* Terminal container */
 .lesson-code {
   width: 900px;
+  height: 420px;              /* ✅ STATIC HEIGHT */
   background: #000;
   border-radius: 14px;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden;           /* 🔒 CONTAIN EVERYTHING */
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  flex-direction: column;
 }
 
-/* Terminal top bar */
+/* Terminal header */
 .lesson-code-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -130,20 +136,14 @@ body {
   border-radius: 50%;
 }
 
-.lesson-code-dot.red {
-  background: #ff5f56;
-}
+.lesson-code-dot.red { background: #ff5f56; }
+.lesson-code-dot.yellow { background: #ffbd2e; }
+.lesson-code-dot.green { background: #27c93f; }
 
-.lesson-code-dot.yellow {
-  background: #ffbd2e;
-}
-
-.lesson-code-dot.green {
-  background: #27c93f;
-}
-
-/* Terminal body */
+/* Terminal body (SCROLL AREA) */
 .lesson-code-body {
+  flex: 1;                    /* ✅ TAKE REMAINING SPACE */
+  overflow: auto;             /* ✅ SCROLL INSIDE ONLY */
   padding: 1.25rem;
 }
 
