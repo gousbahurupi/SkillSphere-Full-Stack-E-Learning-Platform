@@ -96,3 +96,24 @@ body {
   padding: 1.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* ===============================
+   LESSON CODE BLOCK COMPONENT
+================================ */
+@layer components {
+  .lesson-code-wrapper {
+    @apply max-w-full overflow-x-auto rounded-xl border border-white/10;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0; /* FIX FOR FLEX */
+  }
+
+  .lesson-code {
+    @apply w-[900px] bg-black rounded-xl p-5;
+  }
+
+  .lesson-code pre {
+    @apply m-0 text-sm leading-relaxed text-gray-200 font-mono;
+    white-space: pre;
+  }
+}
+
