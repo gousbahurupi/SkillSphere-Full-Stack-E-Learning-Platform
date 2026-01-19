@@ -1,5 +1,24 @@
 import mongoose from "mongoose";
 
+const lessonSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  contentHtml: {
+    type: String,
+    required: true,
+  },
+  videoUrl: {
+    type: String,
+  },
+  order: {
+    type: Number,
+    required: true,
+  },
+});
+
 const courseSchema = new mongoose.Schema(
   {
     title: {
