@@ -31,14 +31,17 @@ export const createCourse = async (req, res) => {
  */
 export const getAllCourses = async (req, res) => {
   try {
-    let query = {};
+    // 🔐 Admin → only own courses
+    if (req.user && req.user.role === "admin") {
+      const courses = await Course.find({
+        createdBy: req.user._id,
+      }).select("-lessons");
 
-    // 🔐 If admin is logged in → only their courses
-    if (req.user?.role === "admin") {
-      query.createdBy = req.user._id;
+      return res.json(courses);
     }
 
-    const courses = await Course.find(query).select("-lessons");
+    // 🌍 Public users → all courses
+    const courses = await Course.find().select("-lessons");
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -46,12 +49,18 @@ export const getAllCourses = async (req, res) => {
 };
 
 
+
 export const getCourseById = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id, // 🔐 ownership check
+    });
 
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(403).json({
+        message: "You are not allowed to access this course",
+      });
     }
 
     res.json(course);
@@ -59,6 +68,7 @@ export const getCourseById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 /**
  * Get course by slug (Public)
  */
@@ -131,8 +141,16 @@ export const deleteCourse = async (req, res) => {
 // Add lesson
 export const addLesson = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
-    if (!course) return res.status(404).json({ message: "Course not found" });
+    const course = await Course.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id, // 🔐 ownership check
+    });
+
+    if (!course) {
+      return res.status(403).json({
+        message: "You are not allowed to modify this course",
+      });
+    }
 
     course.lessons.push(req.body);
     await course.save();
@@ -143,16 +161,26 @@ export const addLesson = async (req, res) => {
   }
 };
 
-// Update lesson
+
 export const updateLesson = async (req, res) => {
   try {
     const { courseId, lessonId } = req.params;
 
-    const course = await Course.findById(courseId);
-    if (!course) return res.status(404).json({ message: "Course not found" });
+    const course = await Course.findOne({
+      _id: courseId,
+      createdBy: req.user._id,
+    });
+
+    if (!course) {
+      return res.status(403).json({
+        message: "You are not allowed to edit lessons of this course",
+      });
+    }
 
     const lesson = course.lessons.id(lessonId);
-    if (!lesson) return res.status(404).json({ message: "Lesson not found" });
+    if (!lesson) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
 
     Object.assign(lesson, req.body);
     await course.save();
@@ -163,13 +191,21 @@ export const updateLesson = async (req, res) => {
   }
 };
 
-// Delete lesson
+
 export const deleteLesson = async (req, res) => {
   try {
     const { courseId, lessonId } = req.params;
 
-    const course = await Course.findById(courseId);
-    if (!course) return res.status(404).json({ message: "Course not found" });
+    const course = await Course.findOne({
+      _id: courseId,
+      createdBy: req.user._id,
+    });
+
+    if (!course) {
+      return res.status(403).json({
+        message: "You are not allowed to delete lessons of this course",
+      });
+    }
 
     course.lessons = course.lessons.filter(
       (lesson) => lesson._id.toString() !== lessonId
