@@ -1,5 +1,7 @@
 import express from "express";
 import authMiddleware from "../middleware/auth.middleware.js";
+import adminMiddleware from "../middleware/admin.middleware.js";
+
 import {
   enrollCourse,
   getMyCourses,
