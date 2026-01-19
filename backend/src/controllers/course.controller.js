@@ -16,6 +16,7 @@ export const createCourse = async (req, res) => {
     const course = await Course.create({
       ...req.body,
       slug,
+      createdBy: req.user._id, // ✅ OWNER SET
     });
 
     res.status(201).json(course);
@@ -24,17 +25,26 @@ export const createCourse = async (req, res) => {
   }
 };
 
+
 /**
  * Get all courses (Public)
  */
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().select("-lessons");
+    let query = {};
+
+    // 🔐 If admin is logged in → only their courses
+    if (req.user?.role === "admin") {
+      query.createdBy = req.user._id;
+    }
+
+    const courses = await Course.find(query).select("-lessons");
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getCourseById = async (req, res) => {
   try {
@@ -71,17 +81,26 @@ export const getCourseBySlug = async (req, res) => {
  */
 export const updateCourse = async (req, res) => {
   try {
-    const updated = await Course.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const course = await Course.findOne({
+      _id: req.params.id,
+      createdBy: req.user._id, // 🔐 ownership check
+    });
 
-    res.json(updated);
+    if (!course) {
+      return res.status(403).json({
+        message: "You are not allowed to edit this course",
+      });
+    }
+
+    Object.assign(course, req.body);
+    await course.save();
+
+    res.json(course);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 /**
@@ -89,7 +108,17 @@ export const updateCourse = async (req, res) => {
  */
 export const deleteCourse = async (req, res) => {
   try {
-    await Course.findByIdAndDelete(req.params.id);
+    const course = await Course.findOneAndDelete({
+      _id: req.params.id,
+      createdBy: req.user._id, // 🔐 ownership check
+    });
+
+    if (!course) {
+      return res.status(403).json({
+        message: "You are not allowed to delete this course",
+      });
+    }
+
     res.json({ message: "Course deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
