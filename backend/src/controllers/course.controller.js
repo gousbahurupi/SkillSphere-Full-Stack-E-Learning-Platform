@@ -16,7 +16,7 @@ export const createCourse = async (req, res) => {
     const course = await Course.create({
       ...req.body,
       slug,
-      createdBy: req.user._id, // ✅ OWNER SET
+      createdBy: req.user._id, // 🔐 OWNER SET
     });
 
     res.status(201).json(course);

@@ -70,3 +70,7 @@ export const deleteLesson = async (courseId, lessonId) => {
   return res.data;
 };
 
+export const getMyAdminCourses = async () => {
+  const res = await api.get("/courses/admin/my-courses");
+  return res.data;
+};

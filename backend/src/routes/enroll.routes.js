@@ -12,11 +12,24 @@ const router = express.Router();
  * Get logged-in user's courses
  * GET /api/enroll/my-courses
  */
+// 🔐 Admin: get own courses only
 router.get(
-  "/my-courses",
+  "/admin/my-courses",
   authMiddleware,
-  getMyCourses
+  adminMiddleware,
+  async (req, res) => {
+    try {
+      const courses = await Course.find({
+        createdBy: req.user._id,
+      }).select("-lessons");
+
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 );
+
 
 /**
  * Mark lesson as completed

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getAllCourses,
+  getMyAdminCourses,
   deleteCourse,
 } from "../../services/course.service";
 
@@ -10,7 +10,7 @@ const AdminCourseList = () => {
   const navigate = useNavigate();
 
   const fetchCourses = async () => {
-    const data = await getAllCourses();
+    const data = await getMyAdminCourses();
     setCourses(data);
   };
 
