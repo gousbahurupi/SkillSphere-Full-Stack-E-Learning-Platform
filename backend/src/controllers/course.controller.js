@@ -8,6 +8,10 @@ export const createCourse = async (req, res) => {
   try {
     const { title } = req.body;
 
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
     const slug = slugify(title, {
       lower: true,
       strict: true,
@@ -16,12 +20,16 @@ export const createCourse = async (req, res) => {
     const course = await Course.create({
       ...req.body,
       slug,
-      createdBy: req.user._id, // 🔐 OWNER SET
+      createdBy: req.user._id, // 🔑 CRITICAL
     });
 
     res.status(201).json(course);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("CREATE COURSE ERROR:", error);
+    res.status(500).json({
+      message: "Failed to create course",
+      error: error.message,
+    });
   }
 };
 
