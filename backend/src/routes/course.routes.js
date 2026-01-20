@@ -1,3 +1,6 @@
+import express from "express";
+import authMiddleware from "../middleware/auth.middleware.js";
+import adminMiddleware from "../middleware/admin.middleware.js";
 import {
   createCourse,
   getAllCourses,
@@ -8,16 +11,16 @@ import {
   deleteLesson,
   getCourseById,
   addLesson,
-  getMyCourses, // ✅ ADD THIS
+  getMyCourses,
 } from "../controllers/course.controller.js";
-
 
 const router = express.Router();
 
 /* ================= PUBLIC ================= */
 router.get("/", getAllCourses);
+router.get("/:slug", getCourseBySlug);
 
-// Admin – get own courses
+/* ================= ADMIN ================= */
 router.get(
   "/admin/my-courses",
   authMiddleware,
@@ -25,7 +28,6 @@ router.get(
   getMyCourses
 );
 
-/* 🔒 ADMIN FETCH BY ID (must come BEFORE :slug) */
 router.get(
   "/id/:id",
   authMiddleware,
@@ -33,11 +35,6 @@ router.get(
   getCourseById
 );
 
-
-/* ================= PUBLIC ================= */
-router.get("/:slug", getCourseBySlug);
-
-/* ================= ADMIN ONLY ================= */
 router.post(
   "/",
   authMiddleware,
@@ -59,7 +56,7 @@ router.delete(
   deleteCourse
 );
 
-/* ================= LESSONS (ADMIN) ================= */
+/* ================= LESSONS ================= */
 router.post(
   "/:id/lessons",
   authMiddleware,
@@ -81,7 +78,4 @@ router.delete(
   deleteLesson
 );
 
-
-
 export default router;
-
