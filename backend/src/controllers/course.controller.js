@@ -1,6 +1,8 @@
 import Course from "../models/Course.js";
 import slugify from "slugify";
 
+/* ================= ADMIN ================= */
+
 /**
  * Create course (Admin only)
  */
@@ -12,57 +14,50 @@ export const createCourse = async (req, res) => {
       return res.status(400).json({ message: "Title is required" });
     }
 
-    const slug = slugify(title, {
-      lower: true,
-      strict: true,
-    });
+    let slug = slugify(title, { lower: true, strict: true });
+
+    // 🔐 Ensure unique slug
+    const slugExists = await Course.findOne({ slug });
+    if (slugExists) {
+      slug = `${slug}-${Date.now()}`;
+    }
 
     const course = await Course.create({
       ...req.body,
       slug,
-      createdBy: req.user._id, // 🔑 CRITICAL
+      createdBy: req.user._id,
     });
 
     res.status(201).json(course);
   } catch (error) {
     console.error("CREATE COURSE ERROR:", error);
-    res.status(500).json({
-      message: "Failed to create course",
-      error: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-
 /**
- * Get all courses (Public)
+ * Get courses created by logged-in admin
  */
-export const getAllCourses = async (req, res) => {
+export const getMyCourses = async (req, res) => {
   try {
-    // 🔐 Admin → only own courses
-    if (req.user && req.user.role === "admin") {
-      const courses = await Course.find({
-        createdBy: req.user._id,
-      }).select("-lessons");
+    const courses = await Course.find({
+      createdBy: req.user._id,
+    }).select("-lessons");
 
-      return res.json(courses);
-    }
-
-    // 🌍 Public users → all courses
-    const courses = await Course.find().select("-lessons");
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-
-
+/**
+ * Get course by ID (Admin only)
+ */
 export const getCourseById = async (req, res) => {
   try {
     const course = await Course.findOne({
       _id: req.params.id,
-      createdBy: req.user._id, // 🔐 ownership check
+      createdBy: req.user._id,
     });
 
     if (!course) {
@@ -78,30 +73,13 @@ export const getCourseById = async (req, res) => {
 };
 
 /**
- * Get course by slug (Public)
- */
-export const getCourseBySlug = async (req, res) => {
-  try {
-    const course = await Course.findOne({ slug: req.params.slug });
-
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    res.json(course);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-/**
  * Update course (Admin only)
  */
 export const updateCourse = async (req, res) => {
   try {
     const course = await Course.findOne({
       _id: req.params.id,
-      createdBy: req.user._id, // 🔐 ownership check
+      createdBy: req.user._id,
     });
 
     if (!course) {
@@ -119,8 +97,6 @@ export const updateCourse = async (req, res) => {
   }
 };
 
-
-
 /**
  * Delete course (Admin only)
  */
@@ -128,7 +104,7 @@ export const deleteCourse = async (req, res) => {
   try {
     const course = await Course.findOneAndDelete({
       _id: req.params.id,
-      createdBy: req.user._id, // 🔐 ownership check
+      createdBy: req.user._id,
     });
 
     if (!course) {
@@ -143,15 +119,13 @@ export const deleteCourse = async (req, res) => {
   }
 };
 
-/**
- * Add lesson to course (Admin only)
- */
-// Add lesson
+/* ================= LESSONS ================= */
+
 export const addLesson = async (req, res) => {
   try {
     const course = await Course.findOne({
       _id: req.params.id,
-      createdBy: req.user._id, // 🔐 ownership check
+      createdBy: req.user._id,
     });
 
     if (!course) {
@@ -168,7 +142,6 @@ export const addLesson = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 export const updateLesson = async (req, res) => {
   try {
@@ -199,7 +172,6 @@ export const updateLesson = async (req, res) => {
   }
 };
 
-
 export const deleteLesson = async (req, res) => {
   try {
     const { courseId, lessonId } = req.params;
@@ -221,6 +193,29 @@ export const deleteLesson = async (req, res) => {
 
     await course.save();
     res.json({ message: "Lesson deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/* ================= PUBLIC ================= */
+
+export const getAllCourses = async (req, res) => {
+  try {
+    const courses = await Course.find().select("-lessons");
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getCourseBySlug = async (req, res) => {
+  try {
+    const course = await Course.findOne({ slug: req.params.slug });
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.json(course);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
