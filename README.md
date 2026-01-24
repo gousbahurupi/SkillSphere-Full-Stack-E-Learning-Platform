@@ -4,7 +4,7 @@ A modern, full-stack **Online Learning Management System (LMS)** built using the
 This platform allows students to explore courses, enroll, watch lessons, and track progress, while admins can manage courses and lessons efficiently.
 
 🌐 **Live Demo**  
-👉 Not deployed yet
+👉 https://skill-sphere-beta.vercel.app
 
 ---
 
